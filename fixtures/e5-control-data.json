@@ -1,0 +1,9 @@
+{
+  "riskIssues": [
+    { "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7", "type": "RISK", "title": "Data progres dari modul lain terlambat tersedia", "level": "MEDIUM", "status": "OPEN" },
+    { "id": "1b4e28ba-2fa1-4d3b-a3fc-2c963f66afa6", "type": "ISSUE", "title": "Contoh isu fiktif pada format laporan", "level": "LOW", "status": "IN_PROGRESS" }
+  ],
+  "changeLog": [
+    { "id": "0d4a5c6e-8f10-4b2a-9c1d-3e5f7a9b1c2d", "title": "Perubahan jadwal UAT (contoh fiktif)", "status": "APPROVED", "decidedAt": "2026-10-12T10:00:00Z", "baselineItemId": null, "affectedTaskIds": [] }
+  ]
+}

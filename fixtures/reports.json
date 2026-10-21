@@ -1,0 +1,26 @@
+[
+  {
+    "reportId": "RPT-2026-014-2026-09",
+    "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+    "period": "2026-09",
+    "periodStart": "2026-09-01",
+    "periodEnd": "2026-09-30",
+    "status": "disetujui",
+    "achievements": ["Kickoff proyek selesai"],
+    "nextPlan": "Menyusun modul laporan bulanan.",
+    "approvedAt": "2026-09-26T09:00:00+07:00",
+    "approvedBy": "USR-0042"
+  },
+  {
+    "reportId": "RPT-2026-014-2026-10",
+    "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+    "period": "2026-10",
+    "periodStart": "2026-10-01",
+    "periodEnd": "2026-10-31",
+    "status": "draft",
+    "achievements": ["Modul laporan bulanan selesai diuji", "Checklist closing versi awal disusun"],
+    "nextPlan": "Menyelesaikan checklist closing dan menyiapkan UAT.",
+    "approvedAt": null,
+    "approvedBy": null
+  }
+]

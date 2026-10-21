@@ -1,0 +1,26 @@
+[
+  {
+    "closureId": "CLS-2026-0001",
+    "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+    "contractEndDate": "2026-12-15",
+    "checklist": [
+      { "itemCode": "FD-01", "category": "final_deliverable", "label": "Final deliverable lengkap dan diterima", "done": false },
+      { "itemCode": "UAT-01", "category": "uat_approval", "label": "Persetujuan UAT klien", "done": false },
+      { "itemCode": "DOC-01", "category": "dokumentasi", "label": "Dokumen administrasi dan teknis lengkap", "done": false },
+      { "itemCode": "HND-01", "category": "handover", "label": "Dokumen handover diserahkan ke klien", "done": false },
+      { "itemCode": "CLS-01", "category": "closure", "label": "Closure report disusun", "done": false }
+    ]
+  },
+  {
+    "closureId": "CLS-2026-0002",
+    "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234568",
+    "contractEndDate": "2026-12-20",
+    "checklist": [
+      { "itemCode": "FD-01", "category": "final_deliverable", "label": "Final deliverable lengkap dan diterima", "done": true },
+      { "itemCode": "UAT-01", "category": "uat_approval", "label": "Persetujuan UAT klien", "done": false },
+      { "itemCode": "DOC-01", "category": "dokumentasi", "label": "Dokumen administrasi dan teknis lengkap", "done": true },
+      { "itemCode": "HND-01", "category": "handover", "label": "Dokumen handover diserahkan ke klien", "done": false },
+      { "itemCode": "CLS-01", "category": "closure", "label": "Closure report disusun", "done": true }
+    ]
+  }
+]

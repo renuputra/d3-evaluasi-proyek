@@ -1,0 +1,17 @@
+{
+  "name": "d3-pelaporan-penutupan",
+  "version": "0.2.0",
+  "description": "Layanan D-3 (Pelaporan, penutupan, dan evaluasi proyek) - ERP PT Anaheim Nimbus Universal. Demo alur lokal pertama dengan mock F-1, D-1, dan E-5. Semua data fiktif.",
+  "private": true,
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "demo": "node scripts/demo.js",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "express-openapi-validator": "^5.4.0"
+  }
+}

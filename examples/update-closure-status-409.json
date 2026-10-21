@@ -1,0 +1,10 @@
+{
+  "code": "CHECKLIST_INCOMPLETE",
+  "message": "Checklist closing belum lengkap: 2 item belum selesai",
+  "details": [
+    {
+      "field": "checklist",
+      "reason": "Item belum selesai: UAT-01, HND-01"
+    }
+  ]
+}

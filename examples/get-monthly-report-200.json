@@ -1,0 +1,72 @@
+{
+  "reportId": "RPT-2026-014-2026-10",
+  "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+  "period": "2026-10",
+  "periodStart": "2026-10-01",
+  "periodEnd": "2026-10-31",
+  "readyTarget": "2026-10-26",
+  "status": "draft",
+  "progressPercent": 62.5,
+  "achievements": [
+    "Modul laporan bulanan selesai diuji",
+    "Checklist closing versi awal disusun"
+  ],
+  "tasksCompleted": [
+    {
+      "taskId": "TSK-0101",
+      "title": "Menyusun form laporan bulanan"
+    },
+    {
+      "taskId": "TSK-0102",
+      "title": "Menguji kompilasi data progres"
+    }
+  ],
+  "tasksOngoing": [
+    {
+      "taskId": "TSK-0110",
+      "title": "Menyusun alur persetujuan closure"
+    }
+  ],
+  "milestones": [
+    {
+      "name": "UAT modul pelaporan",
+      "dueDate": "2026-11-15",
+      "status": "berjalan"
+    }
+  ],
+  "risks": [
+    {
+      "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "title": "Data progres dari modul lain terlambat tersedia",
+      "level": "MEDIUM",
+      "status": "OPEN"
+    }
+  ],
+  "issues": [
+    {
+      "id": "1b4e28ba-2fa1-4d3b-a3fc-2c963f66afa6",
+      "title": "Contoh isu fiktif pada format laporan",
+      "level": "LOW",
+      "status": "OPEN"
+    }
+  ],
+  "resources": [
+    {
+      "userId": "USR-0042",
+      "role": "PM"
+    },
+    {
+      "userId": "USR-0108",
+      "role": "Developer"
+    }
+  ],
+  "nextPlan": "Menyelesaikan checklist closing dan menyiapkan UAT.",
+  "supportingEvidence": [
+    {
+      "name": "bukti-progres-sprint-3.pdf",
+      "url": "https://example.test/evidence/EV-001"
+    }
+  ],
+  "approvedAt": null,
+  "approvedBy": null
+}

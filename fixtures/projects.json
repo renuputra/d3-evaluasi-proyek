@@ -1,0 +1,18 @@
+[
+  {
+    "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+    "canonicalCode": "PRJ-2026-014",
+    "projectName": "Proyek ERP Contoh A",
+    "clientName": "Klien Contoh A",
+    "status": "REGISTERED",
+    "pmEmployeeId": "EMP-0042"
+  },
+  {
+    "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234568",
+    "canonicalCode": "PRJ-2026-015",
+    "projectName": "Proyek ERP Contoh B",
+    "clientName": "Klien Contoh B",
+    "status": "REGISTERED",
+    "pmEmployeeId": "EMP-0042"
+  }
+]

@@ -1,0 +1,552 @@
+{
+  "baseUrl": "http://localhost:3003/api/v1",
+  "langkah": [
+    {
+      "section": "berhasil",
+      "no": 1,
+      "aksi": "PM membuka laporan bulanan periode 2026-10 (GET .../monthly-reports/2026-10)",
+      "harapan": "200; status draft; risks dan issues terisi dari mock E-5; readyTarget 2026-10-26 (H-5)",
+      "terlihat": "HTTP 200; status=draft; risks=1; issues=1; readyTarget=2026-10-26",
+      "lulus": true
+    },
+    {
+      "section": "berhasil",
+      "no": 2,
+      "aksi": "PM membuka closure proyek (GET .../closure)",
+      "harapan": "200; status null; checklistProgress 0; uatStatus belum_diajukan; checklistTargetDate 2026-12-08 (H-7)",
+      "terlihat": "HTTP 200; status=null; progress=0; uatStatus=belum_diajukan; target checklist=2026-12-08",
+      "lulus": true
+    },
+    {
+      "section": "berhasil",
+      "no": 3,
+      "aksi": "PM mencentang item FD-01, DOC-01, HND-01, CLS-01 (PATCH .../checklist/{itemCode}, done=true)",
+      "harapan": "200 setiap item; checklistProgress akhir 80",
+      "terlihat": "HTTP 200; progress=80",
+      "lulus": true
+    },
+    {
+      "section": "berhasil",
+      "no": 4,
+      "aksi": "PM mencatat UAT disetujui klien (PATCH .../checklist/UAT-01, uatResult=disetujui)",
+      "harapan": "200; uatResult disetujui; checklistProgress 100",
+      "terlihat": "HTTP 200; uatResult=disetujui; progress=100",
+      "lulus": true
+    },
+    {
+      "section": "berhasil",
+      "no": 5,
+      "aksi": "PM memindahkan status closure ke siap_ditutup (PATCH .../closure/status)",
+      "harapan": "200; previousStatus null; status siap_ditutup",
+      "terlihat": "HTTP 200; previousStatus=null; status=siap_ditutup; closedAt=null",
+      "lulus": true
+    },
+    {
+      "section": "berhasil",
+      "no": 6,
+      "aksi": "PM memindahkan status closure ke disetujui (PATCH .../closure/status)",
+      "harapan": "200; previousStatus siap_ditutup; status disetujui",
+      "terlihat": "HTTP 200; previousStatus=siap_ditutup; status=disetujui; closedAt=null",
+      "lulus": true
+    },
+    {
+      "section": "berhasil",
+      "no": 7,
+      "aksi": "PM memindahkan status closure ke diserahterimakan (PATCH .../closure/status)",
+      "harapan": "200; previousStatus disetujui; status diserahterimakan",
+      "terlihat": "HTTP 200; previousStatus=disetujui; status=diserahterimakan; closedAt=null",
+      "lulus": true
+    },
+    {
+      "section": "berhasil",
+      "no": 8,
+      "aksi": "PM memindahkan status closure ke ditutup (PATCH .../closure/status)",
+      "harapan": "200; previousStatus diserahterimakan; status ditutup",
+      "terlihat": "HTTP 200; previousStatus=diserahterimakan; status=ditutup; closedAt=2026-10-21T22:05:47+07:00",
+      "lulus": true
+    },
+    {
+      "section": "berhasil",
+      "no": 9,
+      "aksi": "PM memeriksa hasil akhir (GET .../closure)",
+      "harapan": "status ditutup; closedAt terisi; handoverDate 2026-10-28; checklistProgress 100",
+      "terlihat": "status=ditutup; closedAt=2026-10-21T22:05:47+07:00; handoverDate=2026-10-28; progress=100",
+      "lulus": true
+    },
+    {
+      "section": "gagal",
+      "no": 1,
+      "aksi": "Proyek B: PM meminta siap_ditutup saat checklist belum lengkap (UAT-01, HND-01 belum selesai)",
+      "harapan": "409 CHECKLIST_INCOMPLETE; status closure tetap null dan progress tetap 60",
+      "terlihat": "HTTP 409; code=CHECKLIST_INCOMPLETE; detail=\"Item belum selesai: UAT-01, HND-01\"; setelah itu status=null, progress=60",
+      "lulus": true
+    },
+    {
+      "section": "gagal",
+      "no": 2,
+      "aksi": "Proyek A (sudah ditutup): PM mencoba mengembalikan status ke disetujui",
+      "harapan": "409 INVALID_STATUS_TRANSITION",
+      "terlihat": "HTTP 409; code=INVALID_STATUS_TRANSITION; message=\"Status ditutup tidak dapat langsung menjadi disetujui\"",
+      "lulus": true
+    },
+    {
+      "section": "gagal",
+      "no": 3,
+      "aksi": "PM proyek lain (token-contoh-pm-lain) membuka closure proyek A",
+      "harapan": "403 FORBIDDEN",
+      "terlihat": "HTTP 403; code=FORBIDDEN",
+      "lulus": true
+    },
+    {
+      "section": "gagal",
+      "no": 4,
+      "aksi": "Tanpa token Authorization membuka closure proyek A",
+      "harapan": "401 UNAUTHORIZED",
+      "terlihat": "HTTP 401; code=UNAUTHORIZED",
+      "lulus": true
+    },
+    {
+      "section": "gagal",
+      "no": 5,
+      "aksi": "PM membuka closure dengan projectId yang tidak dikenal D-1",
+      "harapan": "404 PROJECT_NOT_FOUND",
+      "terlihat": "HTTP 404; code=PROJECT_NOT_FOUND",
+      "lulus": true
+    }
+  ],
+  "panggilan": [
+    {
+      "request": "GET /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/monthly-reports/2026-10",
+      "token": "token-contoh-pm",
+      "body": null,
+      "status": 200,
+      "response": {
+        "reportId": "RPT-2026-014-2026-10",
+        "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+        "period": "2026-10",
+        "periodStart": "2026-10-01",
+        "periodEnd": "2026-10-31",
+        "readyTarget": "2026-10-26",
+        "status": "draft",
+        "progressPercent": null,
+        "achievements": [
+          "Modul laporan bulanan selesai diuji",
+          "Checklist closing versi awal disusun"
+        ],
+        "tasksCompleted": [],
+        "tasksOngoing": [],
+        "milestones": [],
+        "risks": [
+          {
+            "id": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+            "title": "Data progres dari modul lain terlambat tersedia",
+            "level": "MEDIUM",
+            "status": "OPEN"
+          }
+        ],
+        "issues": [
+          {
+            "id": "1b4e28ba-2fa1-4d3b-a3fc-2c963f66afa6",
+            "title": "Contoh isu fiktif pada format laporan",
+            "level": "LOW",
+            "status": "IN_PROGRESS"
+          }
+        ],
+        "resources": [],
+        "nextPlan": "Menyelesaikan checklist closing dan menyiapkan UAT.",
+        "supportingEvidence": [],
+        "approvedAt": null,
+        "approvedBy": null
+      }
+    },
+    {
+      "request": "GET /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure",
+      "token": "token-contoh-pm",
+      "body": null,
+      "status": 200,
+      "response": {
+        "closureId": "CLS-2026-0001",
+        "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+        "status": null,
+        "contractEndDate": "2026-12-15",
+        "checklistTargetDate": "2026-12-08",
+        "checklist": [
+          {
+            "itemCode": "FD-01",
+            "category": "final_deliverable",
+            "label": "Final deliverable lengkap dan diterima",
+            "done": false,
+            "doneAt": null
+          },
+          {
+            "itemCode": "UAT-01",
+            "category": "uat_approval",
+            "label": "Persetujuan UAT klien",
+            "done": false,
+            "doneAt": null
+          },
+          {
+            "itemCode": "DOC-01",
+            "category": "dokumentasi",
+            "label": "Dokumen administrasi dan teknis lengkap",
+            "done": false,
+            "doneAt": null
+          },
+          {
+            "itemCode": "HND-01",
+            "category": "handover",
+            "label": "Dokumen handover diserahkan ke klien",
+            "done": false,
+            "doneAt": null
+          },
+          {
+            "itemCode": "CLS-01",
+            "category": "closure",
+            "label": "Closure report disusun",
+            "done": false,
+            "doneAt": null
+          }
+        ],
+        "checklistProgress": 0,
+        "uatStatus": "belum_diajukan",
+        "handoverDate": null,
+        "closedAt": null,
+        "lessonsLearned": null,
+        "updatedAt": "2026-10-20T09:00:00+07:00"
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/checklist/FD-01",
+      "token": "token-contoh-pm",
+      "body": {
+        "done": true
+      },
+      "status": 200,
+      "response": {
+        "itemCode": "FD-01",
+        "category": "final_deliverable",
+        "done": true,
+        "doneAt": "2026-10-21T22:05:47+07:00",
+        "uatResult": null,
+        "checklistProgress": 20,
+        "updatedBy": "USR-0042",
+        "updatedAt": "2026-10-21T22:05:47+07:00"
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/checklist/DOC-01",
+      "token": "token-contoh-pm",
+      "body": {
+        "done": true
+      },
+      "status": 200,
+      "response": {
+        "itemCode": "DOC-01",
+        "category": "dokumentasi",
+        "done": true,
+        "doneAt": "2026-10-21T22:05:47+07:00",
+        "uatResult": null,
+        "checklistProgress": 40,
+        "updatedBy": "USR-0042",
+        "updatedAt": "2026-10-21T22:05:47+07:00"
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/checklist/HND-01",
+      "token": "token-contoh-pm",
+      "body": {
+        "done": true
+      },
+      "status": 200,
+      "response": {
+        "itemCode": "HND-01",
+        "category": "handover",
+        "done": true,
+        "doneAt": "2026-10-21T22:05:47+07:00",
+        "uatResult": null,
+        "checklistProgress": 60,
+        "updatedBy": "USR-0042",
+        "updatedAt": "2026-10-21T22:05:47+07:00"
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/checklist/CLS-01",
+      "token": "token-contoh-pm",
+      "body": {
+        "done": true
+      },
+      "status": 200,
+      "response": {
+        "itemCode": "CLS-01",
+        "category": "closure",
+        "done": true,
+        "doneAt": "2026-10-21T22:05:47+07:00",
+        "uatResult": null,
+        "checklistProgress": 80,
+        "updatedBy": "USR-0042",
+        "updatedAt": "2026-10-21T22:05:47+07:00"
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/checklist/UAT-01",
+      "token": "token-contoh-pm",
+      "body": {
+        "done": true,
+        "uatResult": "disetujui",
+        "evidenceNote": "Persetujuan UAT diterima dari klien (offline)"
+      },
+      "status": 200,
+      "response": {
+        "itemCode": "UAT-01",
+        "category": "uat_approval",
+        "done": true,
+        "doneAt": "2026-10-21T22:05:47+07:00",
+        "uatResult": "disetujui",
+        "checklistProgress": 100,
+        "updatedBy": "USR-0042",
+        "updatedAt": "2026-10-21T22:05:47+07:00"
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/status",
+      "token": "token-contoh-pm",
+      "body": {
+        "targetStatus": "siap_ditutup"
+      },
+      "status": 200,
+      "response": {
+        "closureId": "CLS-2026-0001",
+        "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+        "previousStatus": null,
+        "status": "siap_ditutup",
+        "changedBy": "USR-0042",
+        "changedAt": "2026-10-21T22:05:47+07:00",
+        "closedAt": null
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/status",
+      "token": "token-contoh-pm",
+      "body": {
+        "targetStatus": "disetujui"
+      },
+      "status": 200,
+      "response": {
+        "closureId": "CLS-2026-0001",
+        "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+        "previousStatus": "siap_ditutup",
+        "status": "disetujui",
+        "changedBy": "USR-0042",
+        "changedAt": "2026-10-21T22:05:47+07:00",
+        "closedAt": null
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/status",
+      "token": "token-contoh-pm",
+      "body": {
+        "targetStatus": "diserahterimakan",
+        "handoverDate": "2026-10-28"
+      },
+      "status": 200,
+      "response": {
+        "closureId": "CLS-2026-0001",
+        "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+        "previousStatus": "disetujui",
+        "status": "diserahterimakan",
+        "changedBy": "USR-0042",
+        "changedAt": "2026-10-21T22:05:47+07:00",
+        "closedAt": null
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/status",
+      "token": "token-contoh-pm",
+      "body": {
+        "targetStatus": "ditutup"
+      },
+      "status": 200,
+      "response": {
+        "closureId": "CLS-2026-0001",
+        "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+        "previousStatus": "diserahterimakan",
+        "status": "ditutup",
+        "changedBy": "USR-0042",
+        "changedAt": "2026-10-21T22:05:47+07:00",
+        "closedAt": "2026-10-21T22:05:47+07:00"
+      }
+    },
+    {
+      "request": "GET /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure",
+      "token": "token-contoh-pm",
+      "body": null,
+      "status": 200,
+      "response": {
+        "closureId": "CLS-2026-0001",
+        "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234567",
+        "status": "ditutup",
+        "contractEndDate": "2026-12-15",
+        "checklistTargetDate": "2026-12-08",
+        "checklist": [
+          {
+            "itemCode": "FD-01",
+            "category": "final_deliverable",
+            "label": "Final deliverable lengkap dan diterima",
+            "done": true,
+            "doneAt": "2026-10-21T22:05:47+07:00"
+          },
+          {
+            "itemCode": "UAT-01",
+            "category": "uat_approval",
+            "label": "Persetujuan UAT klien",
+            "done": true,
+            "doneAt": "2026-10-21T22:05:47+07:00"
+          },
+          {
+            "itemCode": "DOC-01",
+            "category": "dokumentasi",
+            "label": "Dokumen administrasi dan teknis lengkap",
+            "done": true,
+            "doneAt": "2026-10-21T22:05:47+07:00"
+          },
+          {
+            "itemCode": "HND-01",
+            "category": "handover",
+            "label": "Dokumen handover diserahkan ke klien",
+            "done": true,
+            "doneAt": "2026-10-21T22:05:47+07:00"
+          },
+          {
+            "itemCode": "CLS-01",
+            "category": "closure",
+            "label": "Closure report disusun",
+            "done": true,
+            "doneAt": "2026-10-21T22:05:47+07:00"
+          }
+        ],
+        "checklistProgress": 100,
+        "uatStatus": "disetujui",
+        "handoverDate": "2026-10-28",
+        "closedAt": "2026-10-21T22:05:47+07:00",
+        "lessonsLearned": null,
+        "updatedAt": "2026-10-21T22:05:47+07:00"
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234568/closure/status",
+      "token": "token-contoh-pm",
+      "body": {
+        "targetStatus": "siap_ditutup"
+      },
+      "status": 409,
+      "response": {
+        "code": "CHECKLIST_INCOMPLETE",
+        "message": "Checklist closing belum lengkap: 2 item belum selesai",
+        "details": [
+          {
+            "field": "checklist",
+            "reason": "Item belum selesai: UAT-01, HND-01"
+          }
+        ]
+      }
+    },
+    {
+      "request": "GET /projects/01924b1e-7f32-7a81-9b12-45e8a1234568/closure",
+      "token": "token-contoh-pm",
+      "body": null,
+      "status": 200,
+      "response": {
+        "closureId": "CLS-2026-0002",
+        "projectId": "01924b1e-7f32-7a81-9b12-45e8a1234568",
+        "status": null,
+        "contractEndDate": "2026-12-20",
+        "checklistTargetDate": "2026-12-13",
+        "checklist": [
+          {
+            "itemCode": "FD-01",
+            "category": "final_deliverable",
+            "label": "Final deliverable lengkap dan diterima",
+            "done": true,
+            "doneAt": null
+          },
+          {
+            "itemCode": "UAT-01",
+            "category": "uat_approval",
+            "label": "Persetujuan UAT klien",
+            "done": false,
+            "doneAt": null
+          },
+          {
+            "itemCode": "DOC-01",
+            "category": "dokumentasi",
+            "label": "Dokumen administrasi dan teknis lengkap",
+            "done": true,
+            "doneAt": null
+          },
+          {
+            "itemCode": "HND-01",
+            "category": "handover",
+            "label": "Dokumen handover diserahkan ke klien",
+            "done": false,
+            "doneAt": null
+          },
+          {
+            "itemCode": "CLS-01",
+            "category": "closure",
+            "label": "Closure report disusun",
+            "done": true,
+            "doneAt": null
+          }
+        ],
+        "checklistProgress": 60,
+        "uatStatus": "belum_diajukan",
+        "handoverDate": null,
+        "closedAt": null,
+        "lessonsLearned": null,
+        "updatedAt": "2026-10-20T09:00:00+07:00"
+      }
+    },
+    {
+      "request": "PATCH /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure/status",
+      "token": "token-contoh-pm",
+      "body": {
+        "targetStatus": "disetujui"
+      },
+      "status": 409,
+      "response": {
+        "code": "INVALID_STATUS_TRANSITION",
+        "message": "Status ditutup tidak dapat langsung menjadi disetujui"
+      }
+    },
+    {
+      "request": "GET /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure",
+      "token": "token-contoh-pm-lain",
+      "body": null,
+      "status": 403,
+      "response": {
+        "code": "FORBIDDEN",
+        "message": "Pengguna bukan PM proyek ini"
+      }
+    },
+    {
+      "request": "GET /projects/01924b1e-7f32-7a81-9b12-45e8a1234567/closure",
+      "token": null,
+      "body": null,
+      "status": 401,
+      "response": {
+        "code": "UNAUTHORIZED",
+        "message": "Token tidak ada atau tidak sah"
+      }
+    },
+    {
+      "request": "GET /projects/01924b1e-7f32-7a81-9b12-45e8a9999999/closure",
+      "token": "token-contoh-pm",
+      "body": null,
+      "status": 404,
+      "response": {
+        "code": "PROJECT_NOT_FOUND",
+        "message": "Proyek dengan projectId 01924b1e-7f32-7a81-9b12-45e8a9999999 tidak ditemukan"
+      }
+    }
+  ]
+}

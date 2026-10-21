@@ -1,0 +1,836 @@
+# Kontrak API D-3 (Pelaporan, penutupan, dan evaluasi proyek) - v0.2.0
+openapi: 3.0.3
+info:
+  title: API Pelaporan, Penutupan, dan Evaluasi Proyek (D-3)
+  version: 0.2.0
+  description: 'Kontrak API modul D-3 (Kelas D, Kelompok 3) pada ERP PT Anaheim Nimbus Universal. Versi awal: laporan
+    bulanan, status closure, checklist closing, dan alur status closure. Semua data pada contoh adalah fiktif. Perubahan
+    dari v0.1.0 ada di CHANGELOG.md.'
+servers:
+- url: http://localhost:3003/api/v1
+  description: Lingkungan uji lokal (data fiktif); sesuaikan dengan konfigurasi repositori
+tags:
+- name: laporan-bulanan
+  description: Laporan bulanan proyek (FTR-D3-01)
+- name: closure
+  description: Checklist, UAT, dan status penutupan proyek (FTR-D3-02, FTR-D3-03)
+security:
+- bearerAuth: []
+paths:
+  /projects/{projectId}/monthly-reports/{period}:
+    get:
+      operationId: getMonthlyReport
+      tags:
+      - laporan-bulanan
+      summary: Ambil laporan bulanan satu proyek untuk satu periode (API-K03-01 / FTR-D3-01)
+      description: Hanya PM proyek terkait. Data progres/tugas dari E-4, milestone/resource dari E-3, risiko/isu
+        dari E-5. Tidak ada data finansial atau data pribadi karyawan.
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/Period'
+      responses:
+        '200':
+          description: Laporan ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MonthlyReport'
+              examples:
+                contoh:
+                  value:
+                    reportId: RPT-2026-014-2026-10
+                    projectId: 01924b1e-7f32-7a81-9b12-45e8a1234567
+                    period: 2026-10
+                    periodStart: '2026-10-01'
+                    periodEnd: '2026-10-31'
+                    readyTarget: '2026-10-26'
+                    status: draft
+                    progressPercent: 62.5
+                    achievements:
+                    - Modul laporan bulanan selesai diuji
+                    - Checklist closing versi awal disusun
+                    tasksCompleted:
+                    - taskId: TSK-0101
+                      title: Menyusun form laporan bulanan
+                    - taskId: TSK-0102
+                      title: Menguji kompilasi data progres
+                    tasksOngoing:
+                    - taskId: TSK-0110
+                      title: Menyusun alur persetujuan closure
+                    milestones:
+                    - name: UAT modul pelaporan
+                      dueDate: '2026-11-15'
+                      status: berjalan
+                    risks:
+                    - id: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+                      title: Data progres dari modul lain terlambat tersedia
+                      level: MEDIUM
+                      status: OPEN
+                    issues:
+                    - id: 1b4e28ba-2fa1-4d3b-a3fc-2c963f66afa6
+                      title: Contoh isu fiktif pada format laporan
+                      level: LOW
+                      status: OPEN
+                    resources:
+                    - userId: USR-0042
+                      role: PM
+                    - userId: USR-0108
+                      role: Developer
+                    nextPlan: Menyelesaikan checklist closing dan menyiapkan UAT.
+                    supportingEvidence:
+                    - name: bukti-progres-sprint-3.pdf
+                      url: https://example.test/evidence/EV-001
+                    approvedAt: null
+                    approvedBy: null
+        '400':
+          description: Format period salah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                contoh:
+                  value:
+                    code: INVALID_PERIOD
+                    message: Format period harus YYYY-MM
+                    details:
+                    - field: period
+                      reason: Nilai '2026-13' bukan periode yang valid
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          description: projectId atau laporan periode tersebut tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                projectNotFound:
+                  value:
+                    code: PROJECT_NOT_FOUND
+                    message: Proyek dengan projectId 01924b1e-0000-7000-8000-000000000000 tidak ditemukan
+                reportNotFound:
+                  value:
+                    code: REPORT_NOT_FOUND
+                    message: Laporan periode 2026-09 untuk proyek 01924b1e-7f32-7a81-9b12-45e8a1234567 tidak ditemukan
+  /projects/{projectId}/closure:
+    get:
+      operationId: getClosure
+      tags:
+      - closure
+      summary: Ambil status closure dan checklist proyek (API-K03-02 / FTR-D3-02)
+      description: Hanya PM proyek terkait. Mengembalikan 404 CLOSURE_NOT_FOUND bila closure proyek belum dibuat.
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: includeChecklist
+        in: query
+        required: false
+        description: false hanya mengembalikan status ringkas (checklist = array kosong)
+        schema:
+          type: boolean
+          default: true
+      responses:
+        '200':
+          description: Closure ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Closure'
+              examples:
+                contoh:
+                  value:
+                    closureId: CLS-2026-014
+                    projectId: 01924b1e-7f32-7a81-9b12-45e8a1234567
+                    status: null
+                    contractEndDate: '2026-12-15'
+                    checklistTargetDate: '2026-12-08'
+                    checklist:
+                    - itemCode: FD-01
+                      category: final_deliverable
+                      label: Final deliverable lengkap
+                      done: true
+                      doneAt: '2026-10-20T09:00:00+07:00'
+                    - itemCode: UAT-01
+                      category: uat_approval
+                      label: Persetujuan UAT klien
+                      done: false
+                      doneAt: null
+                    checklistProgress: 50
+                    uatStatus: belum_diajukan
+                    handoverDate: null
+                    closedAt: null
+                    lessonsLearned: null
+                    updatedAt: '2026-10-20T09:00:00+07:00'
+        '400':
+          description: Parameter tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                contoh:
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Parameter includeChecklist harus true atau false
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          description: Proyek atau closure tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                projectNotFound:
+                  value:
+                    code: PROJECT_NOT_FOUND
+                    message: Proyek dengan projectId 01924b1e-0000-7000-8000-000000000000 tidak ditemukan
+                closureNotFound:
+                  value:
+                    code: CLOSURE_NOT_FOUND
+                    message: Closure untuk proyek 01924b1e-7f32-7a81-9b12-45e8a1234567 belum dibuat
+  /projects/{projectId}/closure/checklist/{itemCode}:
+    patch:
+      operationId: updateChecklistItem
+      tags:
+      - closure
+      summary: Centang item checklist dan catat hasil UAT secara manual (API-K03-03 / FTR-D3-02)
+      description: Hanya PM proyek terkait. Untuk item kategori uat_approval, uatResult wajib. Hasil UAT disampaikan
+        klien secara offline.
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ItemCode'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChecklistItemUpdateRequest'
+            examples:
+              uatDisetujui:
+                value:
+                  done: true
+                  uatResult: disetujui
+                  evidenceNote: Persetujuan UAT diterima 2026-10-20
+      responses:
+        '200':
+          description: Item diperbarui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChecklistItemUpdateResponse'
+              examples:
+                contoh:
+                  value:
+                    itemCode: UAT-01
+                    category: uat_approval
+                    done: true
+                    doneAt: '2026-10-20T14:30:00+07:00'
+                    uatResult: disetujui
+                    checklistProgress: 100
+                    updatedBy: USR-0042
+                    updatedAt: '2026-10-20T14:30:00+07:00'
+        '400':
+          description: Isi request tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                contoh:
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Isi request tidak valid
+                    details:
+                    - field: uatResult
+                      reason: Wajib diisi untuk item UAT
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          description: Proyek atau itemCode tidak dikenal
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                contoh:
+                  value:
+                    code: CHECKLIST_ITEM_NOT_FOUND
+                    message: Item checklist XYZ-99 tidak dikenal
+        '409':
+          description: Closure sudah ditutup
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                contoh:
+                  value:
+                    code: CLOSURE_ALREADY_CLOSED
+                    message: Closure sudah berstatus ditutup; checklist tidak dapat diubah
+  /projects/{projectId}/closure/status:
+    patch:
+      operationId: updateClosureStatus
+      tags:
+      - closure
+      summary: Pindahkan status closure ke tahap berikutnya (API-K03-04 / FTR-D3-03)
+      description: 'Hanya PM proyek terkait; PM menyetujui sendiri (tidak ada approver lain, jawaban mitra Q-05).
+        Transisi hanya ke status berikutnya. Ke siap_ditutup: seluruh item checklist selesai dan uatStatus = disetujui.
+        Ke diserahterimakan: handoverDate wajib. Request ulang dengan targetStatus yang sama dengan status saat
+        ini dibalas 200 tanpa mengubah data (idempoten).'
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClosureStatusUpdateRequest'
+            examples:
+              serahTerima:
+                value:
+                  targetStatus: diserahterimakan
+                  handoverDate: '2026-10-28'
+                  note: Serah terima dokumen dan deliverable ke klien.
+              siapDitutup:
+                value:
+                  targetStatus: siap_ditutup
+      responses:
+        '200':
+          description: Status berubah (atau tidak berubah bila request diulang)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ClosureStatusUpdateResponse'
+              examples:
+                contoh:
+                  value:
+                    closureId: CLS-2026-014
+                    projectId: 01924b1e-7f32-7a81-9b12-45e8a1234567
+                    previousStatus: disetujui
+                    status: diserahterimakan
+                    changedBy: USR-0042
+                    changedAt: '2026-10-28T10:15:00+07:00'
+                    closedAt: null
+        '400':
+          description: Isi request tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                contoh:
+                  value:
+                    code: VALIDATION_ERROR
+                    message: Isi request tidak valid
+                    details:
+                    - field: handoverDate
+                      reason: Wajib diisi bila targetStatus = diserahterimakan
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '503':
+          $ref: '#/components/responses/ServiceUnavailable'
+        '404':
+          description: Proyek atau closure tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                contoh:
+                  value:
+                    code: CLOSURE_NOT_FOUND
+                    message: Closure untuk proyek 01924b1e-7f32-7a81-9b12-45e8a1234567 belum dibuat
+        '409':
+          description: Transisi tidak valid, checklist belum lengkap, atau UAT belum disetujui
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              examples:
+                checklistIncomplete:
+                  value:
+                    code: CHECKLIST_INCOMPLETE
+                    message: 'Checklist closing belum lengkap: 2 item belum selesai'
+                    details:
+                    - field: checklist
+                      reason: 'Item belum selesai: UAT-01, HND-01'
+                invalidTransition:
+                  value:
+                    code: INVALID_STATUS_TRANSITION
+                    message: Status siap_ditutup tidak dapat langsung menjadi ditutup
+                uatNotApproved:
+                  value:
+                    code: UAT_NOT_APPROVED
+                    message: UAT belum disetujui klien
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: Token dari F-1 (format final mengikuti F-1)
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: ID proyek kanonis (UUID v7) yang diterbitkan D-1
+      schema:
+        type: string
+      example: 01924b1e-7f32-7a81-9b12-45e8a1234567
+    Period:
+      name: period
+      in: path
+      required: true
+      description: Label periode laporan, format YYYY-MM
+      schema:
+        type: string
+        pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+      example: 2026-10
+    ItemCode:
+      name: itemCode
+      in: path
+      required: true
+      description: Kode item checklist (daftar final menunggu SOP-09 dan WI-07/WI-08)
+      schema:
+        type: string
+      example: UAT-01
+  responses:
+    ServiceUnavailable:
+      description: Layanan yang dibutuhkan (misalnya F-1 atau D-1) tidak dapat dihubungi; data tidak berubah
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            contoh:
+              value:
+                code: DEPENDENCY_UNAVAILABLE
+                message: Layanan yang dibutuhkan (F-1, D-1, atau E-5) tidak dapat dihubungi; coba lagi nanti
+    Unauthorized:
+      description: Token tidak ada atau tidak sah
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            contoh:
+              value:
+                code: UNAUTHORIZED
+                message: Token tidak ada atau tidak sah
+    Forbidden:
+      description: Pengguna sah tetapi bukan PM proyek ini
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            contoh:
+              value:
+                code: FORBIDDEN
+                message: Pengguna bukan PM proyek ini
+  schemas:
+    ErrorDetail:
+      type: object
+      required:
+      - field
+      - reason
+      properties:
+        field:
+          type: string
+        reason:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - message
+      properties:
+        code:
+          type: string
+          description: Kode kesalahan tetap, huruf kapital
+        message:
+          type: string
+          description: Pesan untuk pengguna
+        details:
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+    ReportStatus:
+      type: string
+      enum:
+      - draft
+      - disetujui
+      - revisi
+      description: Status laporan bulanan. revisi kembali ke draft setelah diperbaiki PM.
+    ClosureStatus:
+      type: string
+      enum:
+      - siap_ditutup
+      - disetujui
+      - diserahterimakan
+      - ditutup
+      description: 'Urutan wajib: siap_ditutup -> disetujui -> diserahterimakan -> ditutup (PRD D-3). Tidak boleh
+        melompat.'
+    UatStatus:
+      type: string
+      enum:
+      - belum_diajukan
+      - disetujui
+      - revisi
+      description: UAT disetujui klien secara offline dan dicatat manual oleh PM.
+    ChecklistCategory:
+      type: string
+      enum:
+      - final_deliverable
+      - uat_approval
+      - dokumentasi
+      - handover
+      - closure
+    TaskRef:
+      type: object
+      required:
+      - taskId
+      - title
+      properties:
+        taskId:
+          type: string
+        title:
+          type: string
+    MilestoneItem:
+      type: object
+      required:
+      - name
+      - dueDate
+      - status
+      properties:
+        name:
+          type: string
+        dueDate:
+          type: string
+          format: date
+        status:
+          type: string
+          description: Nilai enum mengikuti kontrak E-3 (masih terbuka)
+    RiskIssueItem:
+      type: object
+      required:
+      - id
+      - title
+      - level
+      - status
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        level:
+          type: string
+          description: Nilai diteruskan apa adanya dari E-5; enum level belum dipublikasikan E-5
+        status:
+          type: string
+          description: Nilai diteruskan apa adanya dari E-5 (OPEN, IN_PROGRESS, CLOSED menurut dokumen E-5 v0.1)
+    ResourceItem:
+      type: object
+      required:
+      - userId
+      - role
+      properties:
+        userId:
+          type: string
+        role:
+          type: string
+    EvidenceItem:
+      type: object
+      required:
+      - name
+      - url
+      properties:
+        name:
+          type: string
+        url:
+          type: string
+          format: uri
+    MonthlyReport:
+      type: object
+      required:
+      - reportId
+      - projectId
+      - period
+      - periodStart
+      - periodEnd
+      - readyTarget
+      - status
+      - achievements
+      - tasksCompleted
+      - tasksOngoing
+      - milestones
+      - risks
+      - issues
+      - resources
+      - supportingEvidence
+      properties:
+        reportId:
+          type: string
+        projectId:
+          type: string
+          description: ID kanonis dari D-1 (UUID v7)
+        period:
+          type: string
+          pattern: ^[0-9]{4}-(0[1-9]|1[0-2])$
+          description: Label periode YYYY-MM
+        periodStart:
+          type: string
+          format: date
+        periodEnd:
+          type: string
+          format: date
+          description: Batas periode satu bulan ditetapkan PM (jawaban mitra Q-02)
+        readyTarget:
+          type: string
+          format: date
+          description: Target laporan siap = periodEnd dikurangi 5 hari (H-5)
+        status:
+          $ref: '#/components/schemas/ReportStatus'
+        progressPercent:
+          type: number
+          minimum: 0
+          maximum: 100
+          nullable: true
+          description: Dari E-4
+        achievements:
+          type: array
+          items:
+            type: string
+        tasksCompleted:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskRef'
+        tasksOngoing:
+          type: array
+          items:
+            $ref: '#/components/schemas/TaskRef'
+        milestones:
+          type: array
+          items:
+            $ref: '#/components/schemas/MilestoneItem'
+        risks:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskIssueItem'
+        issues:
+          type: array
+          items:
+            $ref: '#/components/schemas/RiskIssueItem'
+        resources:
+          type: array
+          items:
+            $ref: '#/components/schemas/ResourceItem'
+        nextPlan:
+          type: string
+          nullable: true
+        supportingEvidence:
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidenceItem'
+        approvedAt:
+          type: string
+          format: date-time
+          nullable: true
+        approvedBy:
+          type: string
+          nullable: true
+          description: userId PM yang menyetujui
+    ChecklistItem:
+      type: object
+      required:
+      - itemCode
+      - category
+      - label
+      - done
+      properties:
+        itemCode:
+          type: string
+        category:
+          $ref: '#/components/schemas/ChecklistCategory'
+        label:
+          type: string
+        done:
+          type: boolean
+        doneAt:
+          type: string
+          format: date-time
+          nullable: true
+    Closure:
+      type: object
+      required:
+      - closureId
+      - projectId
+      - contractEndDate
+      - checklistTargetDate
+      - checklistProgress
+      - uatStatus
+      - updatedAt
+      properties:
+        closureId:
+          type: string
+        projectId:
+          type: string
+        status:
+          type: string
+          nullable: true
+          enum:
+          - siap_ditutup
+          - disetujui
+          - diserahterimakan
+          - ditutup
+          - null
+          description: Nilai ClosureStatus; null = closure sudah dimulai tetapi belum siap_ditutup
+        contractEndDate:
+          type: string
+          format: date
+          description: Dari D-1/D-2
+        checklistTargetDate:
+          type: string
+          format: date
+          description: Target checklist siap = contractEndDate dikurangi 7 hari (H-7)
+        checklist:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChecklistItem'
+        checklistProgress:
+          type: number
+          minimum: 0
+          maximum: 100
+        uatStatus:
+          $ref: '#/components/schemas/UatStatus'
+        handoverDate:
+          type: string
+          format: date
+          nullable: true
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+        lessonsLearned:
+          type: string
+          nullable: true
+          description: Teks bebas (jawaban mitra Q-08)
+        updatedAt:
+          type: string
+          format: date-time
+    ChecklistItemUpdateRequest:
+      type: object
+      required:
+      - done
+      properties:
+        done:
+          type: boolean
+        uatResult:
+          type: string
+          enum:
+          - disetujui
+          - revisi
+          description: Wajib bila category item = uat_approval
+        evidenceNote:
+          type: string
+          maxLength: 500
+    ChecklistItemUpdateResponse:
+      type: object
+      required:
+      - itemCode
+      - category
+      - done
+      - checklistProgress
+      - updatedBy
+      - updatedAt
+      properties:
+        itemCode:
+          type: string
+        category:
+          $ref: '#/components/schemas/ChecklistCategory'
+        done:
+          type: boolean
+        doneAt:
+          type: string
+          format: date-time
+          nullable: true
+        uatResult:
+          type: string
+          enum:
+          - disetujui
+          - revisi
+          - null
+          nullable: true
+        checklistProgress:
+          type: number
+          minimum: 0
+          maximum: 100
+        updatedBy:
+          type: string
+        updatedAt:
+          type: string
+          format: date-time
+    ClosureStatusUpdateRequest:
+      type: object
+      required:
+      - targetStatus
+      properties:
+        targetStatus:
+          $ref: '#/components/schemas/ClosureStatus'
+        handoverDate:
+          type: string
+          format: date
+          description: Wajib bila targetStatus = diserahterimakan
+        note:
+          type: string
+          maxLength: 500
+    ClosureStatusUpdateResponse:
+      type: object
+      required:
+      - closureId
+      - projectId
+      - status
+      - changedBy
+      - changedAt
+      properties:
+        closureId:
+          type: string
+        projectId:
+          type: string
+        previousStatus:
+          type: string
+          nullable: true
+          enum:
+          - siap_ditutup
+          - disetujui
+          - diserahterimakan
+          - ditutup
+          - null
+          description: Nilai ClosureStatus; null jika sebelumnya belum ada status
+        status:
+          $ref: '#/components/schemas/ClosureStatus'
+        changedBy:
+          type: string
+        changedAt:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Terisi hanya jika status = ditutup
